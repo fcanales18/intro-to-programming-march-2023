@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,9 +36,45 @@ public class OverdraftNotAllowed
         var account = new BankAccount();
         var openingBalance = account.GetBalance();
 
+        
         Assert.Throws<OverdraftException>(() =>
         {
             account.Withdraw(account.GetBalance() + .01M);
         });
+        //below is an example of using delegates and using () => { }. Above is the shorter and cleaner way
+        //var exceptionHelper = new ExceptionHelpers();
+
+        /*
+        var rightExceptionThrow = ExceptionHelpers.Throws<OverdraftException>(() =>
+        {
+            account.Withdraw(account.GetBalance() + .01M);
+        });
+
+        Assert.True(rightExceptionThrow);
+        */
+    }
+}
+
+public class ExceptionHelpers
+{
+    public static bool Throws<TException>(Action suspectCode) where TException : Exception // Generic Constraint
+    {
+        var rightExceptionThrown = false;
+        try
+        {
+            //run some code here. Execute some code here
+            suspectCode();
+        }
+        catch (TException)
+        {
+            rightExceptionThrown = true;
+        }
+
+        return rightExceptionThrown;
+    }
+
+    public static string FormatName(string first, string last)
+    {
+        return $"{last}, {first}";
     }
 }
