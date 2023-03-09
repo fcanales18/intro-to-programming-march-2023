@@ -7,6 +7,7 @@ public class OnCallDeveloperController : ControllerBase
     [HttpGet("/oncalldeveloper")]
     public ActionResult GetOnCallDeveloper()
     {
-        return Ok(); // 200 status code
+        var response = new GetOnCallDeveloperResponse("Mike N.", "555-1212", "mike@aol.com");
+        return Ok(response); // 200 status code
     }
 }
