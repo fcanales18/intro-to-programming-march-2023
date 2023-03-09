@@ -1,4 +1,5 @@
 ﻿using Banking.Domain;
+using Banking.UnitTests.TestDoubles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,9 @@ public class NewAccounts
     public void NewAccountHasCorrectOpeningBalance()
     {
         //"Write the code you Wish you had"
-
         //Given
         //Type identifier = initializer
-        BankAccount account = new BankAccount();
+        BankAccount account = new BankAccount(new DummyBonusCalculator());
         //When
         decimal balance = account.GetBalance();
         //Then
