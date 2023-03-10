@@ -36,7 +36,7 @@ public class StringCalculatorTests
         Assert.Equal(expected, result);
     }
 
-    /*
+    
     [Theory]
     [InlineData("4,5, 45,60", 114)]
     [InlineData("12,340, 1", 353)]
@@ -48,7 +48,7 @@ public class StringCalculatorTests
 
         Assert.Equal(expected, result);
     }
-    */
+    
 
     [Theory]
     [InlineData("1\n2",3)]
@@ -62,7 +62,7 @@ public class StringCalculatorTests
         Assert.Equal(expected, result);
     }
 
-    /*
+    
     [Fact]
     public void DifferentDelimitters()
     {
@@ -72,5 +72,5 @@ public class StringCalculatorTests
 
         Assert.Equal(3, result);
     }
-    */
+    
 }

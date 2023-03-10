@@ -32,7 +32,7 @@ public class StringCalculator
     public int Add(string numbers)
     {
         if (numbers == "") { return 0; }
-        var allowedDelimeters = new List<char> { ',', '\n' };
+        var allowedDelimeters = new List<char> { ',', '\n', '//', ';' };
 
         /*
         var total = 0;
