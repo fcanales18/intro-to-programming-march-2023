@@ -52,12 +52,14 @@ public class Collections
             Name = "Robert",
             Salary = 82_000M
         };
-
+        
         var jeff = new Contractor();
         jeff.Name = "Jeffry";
         jeff.HourlyRate = 28.58M;
 
-        var workers = new List<Worker>
+        IProvidePayInformation sue = new Employee {  Name = "Susan", Salary = 230_000 };
+
+        var workers = new List<IProvidePayInformation>
         {
             bob,
             jeff,
@@ -69,6 +71,37 @@ public class Collections
 
 
     }
+
+    [Fact]
+    public void Dictionaries()
+    {
+        var myFriends = new Dictionary<char, string>
+        {
+            { 's', "Same" },
+            { 'd', "David" }
+        };
+
+        myFriends['s'] = "Sean";
+        Assert.Equal("Sean", myFriends['s']);
+
+        foreach(KeyValuePair<char, string> kvp in myFriends)
+        {
+           
+        }
+        foreach(var key in myFriends.Keys)
+        {
+
+        }
+        foreach(var value in myFriends.Values)
+        {
+
+        }
+    }
+}
+
+public interface IProvidePayInformation
+{
+    decimal GetPay();
 }
 
 public abstract class Worker
@@ -77,20 +110,22 @@ public abstract class Worker
     public abstract decimal GetPay();
 }
 
-public class Employee : Worker
+public class Employee : IProvidePayInformation
 {
+    public string Name { get; set; } = string.Empty;
     public decimal Salary { get; set; }
-    public override decimal GetPay()
+    public  decimal GetPay()
     {
         return Salary;
     }
 }
 
-public class Contractor : Worker
+public class Contractor : IProvidePayInformation
 {
+    public string Name { get; set; } = string.Empty;
     //public string Name { get; set; } = string.Empty;
     public decimal HourlyRate { get; set; }
-    public override decimal GetPay()
+    public  decimal GetPay()
     {
         return HourlyRate;
     }
