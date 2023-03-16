@@ -4,8 +4,16 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { map, switchMap } from 'rxjs';
 import { itemsCommands, itemsDocuments } from '../actions/items.actions';
-import { ItemEntity } from '../reducers/items.reducer'; @Injectable()
+import { ItemEntity } from '../reducers/items.reducer'; 
+
+@Injectable()
 export class ItemsEffects {
+
+// add the new item
+// send that payload on the action to the API using a POST
+// when it comes the API, turn it into a itemsDocuments.item and sent it to the reducers
+
+
   loadItems$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(itemsCommands.loadTheItems),
