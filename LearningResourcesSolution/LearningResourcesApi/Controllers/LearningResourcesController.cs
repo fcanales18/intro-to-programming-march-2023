@@ -1,59 +1,90 @@
 ﻿
-
 using LearningResourcesApi.Domain;
 
 namespace LearningResourcesApi.Controllers;
 
 public class LearningResourcesController : ControllerBase
 {
-    private readonly LearningResourcesDataContext _context;
 
-    public LearningResourcesController(LearningResourcesDataContext context)
+    private readonly IManageLearningResources _resourceManager;
+
+    public LearningResourcesController(IManageLearningResources resourceManager)
     {
-        _context = context;
+        _resourceManager = resourceManager;
     }
+
+    [HttpPost("/watched-learning-resources")]
+    public async Task<ActionResult> MoveToWatched([FromBody] LearningResourceSummaryItem request)
+    {
+        bool exists = await _resourceManager.MoveItemToWatchedAsync(request);
+        if (!exists)
+        {
+            return BadRequest();
+        }
+        else
+        {
+            return NoContent();
+        }
+
+    }
+
+    [HttpDelete("/learning-resources/{resourceId:int}")]
+    public async Task<ActionResult> Remove(int resourceId)
+    {
+        // Idempotent - doing it multiple times is the same as doing it once.
+        // check to see if there is a resource with id, and if there is "remove"
+        await _resourceManager.RemoveItemAsync(resourceId);
+        return NoContent(); // passive-aggressive "Fine!"
+    }
+
 
     [HttpPost("/learning-resources")]
     public async Task<ActionResult<LearningResourceSummaryItem>> AddResources(
         [FromBody] LearningResourcesCreateRequest request)
     {
-        // Validate it.. If it doesn't meet the invariants, return a 400.
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-        // Add it to the database.
-        //   - turn the request -> Domain.LearningResourcesEntity
-        var entity = new LearningResourcesEntity
-        {
-            // "Mapping" - AutoMapper
-            Name = request.Name,
-            Description = request.Description,
-            Link = request.Link,
-            WhenCreated = DateTime.Now
-        };
-        //   - tell our DataContext about it.
-        _context.LearningResources.Add(entity);
-        //   - tell the DataContext to save the data.
-        await _context.SaveChangesAsync(); // Releases the thread. Don't hang out here, take someone else's order, we'll let you know when its done. Then if data is ready, then Order Up!
-        // Return a Success Status Code*
-        //   - With a copy of the brand new entity
-        var response = new LearningResourceSummaryItem(entity.Id.ToString(), entity.Name, entity.Description, entity.Link);
+
+        LearningResourceSummaryItem response = await _resourceManager.AddResourceAsync(request);
         return Ok(response);
 
     }
 
 
     [HttpGet("/learning-resources")]
-    public async Task<ActionResult<LearningResourcesResponse>> GetLearningResources(CancellationToken token)
+    public async Task<ActionResult<LearningResourcesResponse>> GetLearningResources(CancellationToken token, [FromQuery] bool? watched = null)
     {
-        var data = await _context.LearningResources
-            .Where(item => item.WhenRemoved == null)
-            .Select(item => new LearningResourceSummaryItem(
-                item.Id.ToString(), item.Name, item.Description, item.Link))
-            .ToListAsync(token);
+        LearningResourcesResponse response;
+        if (watched.HasValue)
+        {
+            response = await _resourceManager.GetCurrentResourcesAsync(token, watched.Value);
 
-        var response = new LearningResourcesResponse(data);
+        }
+        else
+        {
+
+            response = await _resourceManager.GetCurrentResourcesAsync(token);
+        }
+
+        // Write the Code I wish I had
         return Ok(response);
+    }
+
+    [HttpGet("/learning-resources/{resourceId:int}")]
+    public async Task<ActionResult<LearningResourceSummaryItem>> GetById(int resourceId)
+    {
+        // Either a 200 Ok, with item, or 404
+        LearningResourceSummaryItem? response = await _resourceManager.GetResourceByIdAsync(resourceId);
+        if (response == null)
+        {
+            return NotFound();
+        }
+        else
+        {
+            return Ok(response);
+        }
     }
 }
