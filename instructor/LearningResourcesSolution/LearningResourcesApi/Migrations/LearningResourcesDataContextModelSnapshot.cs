@@ -34,6 +34,9 @@ namespace LearningResourcesApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasBeenWatched")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
